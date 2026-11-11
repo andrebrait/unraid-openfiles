@@ -33,19 +33,25 @@ function getDatatableConfig(url) {
     },
     columns: [
       { name: "PID", data: "PID" },
-      { name: "name", data: "name" },
-      { name: "container", data: "containerName" },
+      { name: "name", data: "name", render: DataTable.render.text() },
+      {
+        name: "container",
+        data: "containerName",
+        render: DataTable.render.text(),
+      },
       {
         name: "kill",
         data: "PID",
         render: function (data, type, row) {
           if (type === "display") {
+            // encodeURIComponent leaves ' unescaped, which would end the onclick attribute
+            const name = encodeURIComponent(row.name).replace(/'/g, "%27");
             let button = `<input title='${translator.tr(
               "enable_kill"
             )}' type='checkbox' onclick='$("#kill_button${data}").prop("disabled",!this.checked);'>`;
             button += `<button class='kill-button' title='${translator.tr(
               "kill_process_desc"
-            )}' id='kill_button${data}' disabled onclick='openBox("/plugins/open.files/scripts/killprocess&arg1=${data}","Kill Process",450,450,true)'>${translator.tr(
+            )}' id='kill_button${data}' disabled onclick='openBox("/plugins/open.files/scripts/killprocess&arg1=${data}&arg2=${name}","Kill Process",450,450,true)'>${translator.tr(
               "kill"
             )}</button>`;
             return button;

@@ -11,9 +11,8 @@
  */
 
 
-function get_ps_name($pnum) {
-	return shell_exec("ps h $pnum |  awk '{ print $5 }'  2>&1 ");
-}
+const KILL_TERM = 15;
+const KILL_KILL = 9;
 
 function flush_all() {
 	if (ob_get_contents() !== false) {
@@ -23,62 +22,112 @@ function flush_all() {
 	usleep(500);  //* 5 hundreths of a second
 }
 
-$pnum = $argv[1];
-$pname = get_ps_name($pnum);
-
-echo "Ending process $pnum...\n";
-
-$ps = shell_exec("ps --no-headers  $pnum  2> /dev/null");
-
-//***************************************
-//* Check to see if it is still running
-//***************************************
-if ((isset($ps)) && (strlen($ps) > 2)) {
-	//echo "... program:$prog (id:$pnum) is using $fname\n";
-	flush_all();
-
-	//***************************************
-	//* Kill softly
-	//***************************************
-
-	shell_exec("kill -INT $pnum  2> /dev/null");
-	$ps = shell_exec("ps --no-headers  $pnum  2> /dev/null");
-	if ((isset($ps)) && (strlen($ps) > 2)) {
-		echo "Checking...\n";
-		sleep(3);
-
-		//***************************************
-		//*  Kill hard
-		//***************************************        
-
-		shell_exec("kill $pnum  2> /dev/null");
-		$ps = shell_exec("ps --no-headers  $pnum  2>&1 ");
-		if ((isset($ps)) && (strlen($ps) > 2)) {
-
-			//***************************************
-			//*  Kill -9
-			//***************************************   
-
-			echo "Process $pnum could not be gently killed... will use SIGKILL...\n";
-			echo "Process $pnum (" . shell_exec("kill -9 $pnum 2> /dev/null") . ")...\n";
-		} else {
-			echo "Process $pnum killed with SIGHUP...\n";
-		}
-	} else {
-		echo "Process $pnum ... killed...\n";
+//* Returns [state, ppid, starttime] from /proc/PID/stat, or null if the process is gone.
+//* The start time tells apart two processes that got the same PID at different times.
+function proc_stat($pid) {
+	$stat = @file_get_contents("/proc/$pid/stat");
+	if ($stat === false) {
+		return null;
 	}
-				
-} else {
-	echo "Process $pnum has ended...\n";
+	// comm may contain spaces and parentheses, so split after the last ")"
+	$fields = explode(" ", substr($stat, strrpos($stat, ")") + 2));
+	return [$fields[0], (int)$fields[1], $fields[19]];
 }
-			
-$ps = shell_exec("ps --no-headers  $pnum  2>&1 ");
 
-if ((isset($ps)) && (strlen($ps) > 2)) {
-	echo "FAILED....\n";
-} else {
-	echo "Success...\n";
+function proc_comm($pid) {
+	$comm = @file_get_contents("/proc/$pid/comm");
+	return $comm === false ? null : rtrim($comm, "\n");
 }
-    
+
+//* True while the very process started at $start is running (a zombie is already dead, it only waits to be reaped)
+function target_alive($pid, $start) {
+	$stat = proc_stat($pid);
+	return $stat !== null && $stat[2] === $start && $stat[0] !== "Z";
+}
+
+function refuse($message) {
+	echo "$message\n";
+	echo "FAILED....\n";
+	flush_all();
+	exit(1);
+}
+
+$pnum  = $argv[1] ?? "";
+$pname = $argv[2] ?? "";
+
+if (!ctype_digit($pnum) || (int)$pnum <= 1) {
+	refuse("Invalid process id.");
+}
+if ($pname === "") {
+	refuse("Missing process name.");
+}
+$pid = (int)$pnum;
+
+//* Never kill ourselves, our ancestors (PHP/nginx/emhttpd serving this request) or the web server itself
+$protected = [];
+for ($p = getmypid(); $p > 1 && !in_array($p, $protected, true); $p = $stat[1] ?? 0) {
+	$protected[] = $p;
+	$stat        = proc_stat($p);
+	if ($stat === null) {
+		break;
+	}
+}
+$target = proc_stat($pid);
+$comm   = proc_comm($pid);
+if (in_array($pid, $protected, true) || ($comm !== null && preg_match('/^(nginx|emhttpd|php-fpm.*)$/', $comm))) {
+	refuse("Process $pid is part of the web interface and will not be killed.");
+}
+
+echo "Ending process $pid...\n";
+
+if ($target === null || $target[0] === "Z" || $comm === null) {
+	echo "Process $pid has ended...\n";
+	echo "Success...\n";
+	flush_all();
+	exit(0);
+}
+$start = $target[2];
+
+//* The UI may be stale: make sure the PID still belongs to the process the user saw.
+//* open.files runs lsof without +c, so it shows COMMAND cut to 9 characters; /proc/PID/comm has up to 15.
+if ($pname !== $comm && $pname !== substr($comm, 0, 9)) {
+	refuse("Process $pid is now '$comm', not '$pname'. Refusing to kill it.");
+}
+
+flush_all();
+
+//***************************************
+//* Kill softly (SIGTERM, up to 10 seconds)
+//***************************************
+if (!target_alive($pid, $start)) {
+	refuse("Process $pid changed while it was being checked. Refusing to kill it.");
+}
+posix_kill($pid, KILL_TERM);
+for ($i = 0; $i < 20 && target_alive($pid, $start); $i++) {
+	if ($i === 0) {
+		echo "Checking...\n";
+		flush_all();
+	}
+	usleep(500000);
+}
+
+if (!target_alive($pid, $start)) {
+	echo "Process $pid killed with SIGTERM...\n";
+} else {
+	//***************************************
+	//* Kill hard
+	//***************************************
+	echo "Process $pid could not be gently killed... will use SIGKILL...\n";
+	posix_kill($pid, KILL_KILL);
+	usleep(500000);
+}
+
+if (target_alive($pid, $start)) {
+	echo "FAILED....\n";
+	flush_all();
+	exit(1);
+}
+echo "Success...\n";
+
 flush_all();
 ?>
