@@ -9,3 +9,7 @@ Open Files for Unraid Server
 ![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/dkaser/unraid-openfiles/latest/total)
 
 This plugin adds the ability to monitor processes that have open files that might keep the aray from shutting down cleanly.  You can kill any processes that have open files preventing array shutdown.  This plugin only works on V6.1 and later versions of Unraid.
+
+## CI maintenance
+
+Workflow actions use SHA-pinned versions of their latest available major releases. The custom release-drafter pin is retained because its conventional-commit changes are not on the upstream default branch. The PHP-CS-Fixer Docker action continues to track its `latest` image.
