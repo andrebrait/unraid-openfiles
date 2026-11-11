@@ -25,7 +25,7 @@ use Slim\Factory\AppFactory;
 
 require_once dirname(__FILE__) . "/include/common.php";
 
-$prefix = "/plugins/open.files/data.php";
+$prefix = "/plugins/open.files3/data.php";
 
 if ( ! defined(__NAMESPACE__ . '\PLUGIN_ROOT') || ! defined(__NAMESPACE__ . '\PLUGIN_NAME')) {
     throw new \RuntimeException("Common file not loaded.");

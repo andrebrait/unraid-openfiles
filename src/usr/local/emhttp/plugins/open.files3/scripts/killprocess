@@ -89,7 +89,7 @@ if ($target === null || $target[0] === "Z" || $comm === null) {
 $start = $target[2];
 
 //* The UI may be stale: make sure the PID still belongs to the process the user saw.
-//* open.files runs lsof without +c, so it shows COMMAND cut to 9 characters; /proc/PID/comm has up to 15.
+//* Open Files runs lsof without +c, so it shows COMMAND cut to 9 characters; /proc/PID/comm has up to 15.
 if ($pname !== $comm && $pname !== substr($comm, 0, 9)) {
 	refuse("Process $pid is now '$comm', not '$pname'. Refusing to kill it.");
 }

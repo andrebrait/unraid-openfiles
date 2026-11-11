@@ -2,12 +2,12 @@
 <!DOCTYPE PLUGIN>
 
 <PLUGIN 
-  name="open.files"
+  name="open.files3"
   author="Derek Kaser"
   version="{{ env['PLUGIN_VERSION'] }}"
   launch="Tools/OpenFiles"
-  pluginURL="https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files.plg"
-  support="https://forums.unraid.net/topic/191179-plugin-open-files-see-whats-preventing-unraid-from-shutting-down/"
+  pluginURL="https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files3.plg"
+  support="https://github.com/andrebrait/unraid-openfiles/issues"
   min="7.0.0"
   icon="folder-open"
 >
@@ -20,7 +20,7 @@ For older releases, see https://github.com/andrebrait/unraid-openfiles/releases
 ]]>
 </CHANGES>
 
-<FILE Name="/boot/config/plugins/open.files/unraid-openfiles-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz">
+<FILE Name="/boot/config/plugins/open.files3/unraid-openfiles-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz">
 <URL>https://github.com/andrebrait/unraid-openfiles/releases/download/{{ env['PLUGIN_VERSION'] }}/unraid-openfiles-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz</URL>
 <SHA256>{{ env['PLUGIN_CHECKSUM'] }}</SHA256>
 </FILE>
@@ -31,16 +31,25 @@ The 'install' script.
 <FILE Run="/bin/bash">
 <INLINE>
 <![CDATA[
-upgradepkg --install-new /boot/config/plugins/open.files/unraid-openfiles-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz
+# Replace the previous plugin of this name: keep its settings, then remove it.
+OLD=/boot/config/plugins/open.files
+NEW=/boot/config/plugins/open.files3
+if [ -d "$OLD" ] && ! ls -A "$NEW" | grep -qv '\.txz$'; then
+  find "$OLD" -mindepth 1 -maxdepth 1 ! -name '*.txz' -exec cp -a {} "$NEW"/ \;
+fi
+rm -f /boot/config/plugins/open.files.plg /var/log/plugins/open.files.plg
+rm -rf "$OLD" /usr/local/emhttp/plugins/open.files
+
+upgradepkg --install-new /boot/config/plugins/open.files3/unraid-openfiles-{{ env['PLUGIN_VERSION'] }}-noarch-1.txz
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/open.files/unraid-openfiles-*.txz 2>/dev/null | grep -v '{{ env['PLUGIN_VERSION'] }}')
+rm -f $(ls /boot/config/plugins/open.files3/unraid-openfiles-*.txz 2>/dev/null | grep -v '{{ env['PLUGIN_VERSION'] }}')
 
-echo "VERSION={{ env['PLUGIN_VERSION'] }}" > /usr/local/emhttp/plugins/open.files/version.ini
+echo "VERSION={{ env['PLUGIN_VERSION'] }}" > /usr/local/emhttp/plugins/open.files3/version.ini
 
 echo ""
 echo "----------------------------------------------------"
-echo " open.files has been installed."
+echo " open.files3 has been installed."
 echo " Version: {{ env['PLUGIN_VERSION'] }}"
 echo "----------------------------------------------------"
 echo ""
@@ -56,8 +65,8 @@ The 'remove' script.
 <![CDATA[
 removepkg unraid-openfiles
 
-rm -rf /usr/local/emhttp/plugins/open.files
-rm -rf /boot/config/plugins/open.files
+rm -rf /usr/local/emhttp/plugins/open.files3
+rm -rf /boot/config/plugins/open.files3
 ]]>
 </INLINE>
 </FILE>

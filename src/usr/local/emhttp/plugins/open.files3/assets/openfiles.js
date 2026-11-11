@@ -51,7 +51,7 @@ function getDatatableConfig(url) {
             )}' type='checkbox' onclick='$("#kill_button${data}").prop("disabled",!this.checked);'>`;
             button += `<button class='kill-button' title='${translator.tr(
               "kill_process_desc"
-            )}' id='kill_button${data}' disabled onclick='openBox("/plugins/open.files/scripts/killprocess&arg1=${data}&arg2=${name}","Kill Process",450,450,true)'>${translator.tr(
+            )}' id='kill_button${data}' disabled onclick='openBox("/plugins/open.files3/scripts/killprocess&arg1=${data}&arg2=${name}","Kill Process",450,450,true)'>${translator.tr(
               "kill"
             )}</button>`;
             return button;
