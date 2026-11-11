@@ -35,17 +35,17 @@ if (version_compare($vars['version'] ?? "", '7.1', '<=')) {
     echo "<style>div.dtcc-dropdown * { color: black }</style>";
 }
 ?>
-<script src="/plugins/open.files/assets/translate.js"></script>
+<script src="/plugins/open.files3/assets/translate.js"></script>
 <script>
-    const translator = new Translator("/plugins/open.files");
+    const translator = new Translator("/plugins/open.files3");
 </script>
 
-<link type="text/css" rel="stylesheet" href="/plugins/open.files/assets/style.css">
+<link type="text/css" rel="stylesheet" href="/plugins/open.files3/assets/style.css">
 
-<link href="/plugins/open.files/assets/datatables.min.css" rel="stylesheet">
-<script src="/plugins/open.files/assets/datatables.min.js"></script>
+<link href="/plugins/open.files3/assets/datatables.min.css" rel="stylesheet">
+<script src="/plugins/open.files3/assets/datatables.min.js"></script>
 
-<script src="/plugins/open.files/assets/openfiles.js"></script>
+<script src="/plugins/open.files3/assets/openfiles.js"></script>
 
 <table id='fileTable' class="stripe compact">
     <thead>
@@ -70,7 +70,7 @@ if (version_compare($vars['version'] ?? "", '7.1', '<=')) {
 <script>
 $(document).ready( async function () {
     await translator.init();
-    $('#fileTable').DataTable(getDatatableConfig('/plugins/open.files/data.php/files'));
+    $('#fileTable').DataTable(getDatatableConfig('/plugins/open.files3/data.php/files'));
 } );
 </script>
 

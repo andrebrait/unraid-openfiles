@@ -4,6 +4,6 @@ api_token_env: CROWDIN_PERSONAL_TOKEN
 preserve_hierarchy: true
 
 files:
-  - source: /src/usr/local/emhttp/plugins/open.files/locales/en_US.json
+  - source: /src/usr/local/emhttp/plugins/open.files3/locales/en_US.json
     dest: /unraid-openfiles/en_US.json
-    translation: /src/usr/local/emhttp/plugins/open.files/locales/%locale_with_underscore%.json
+    translation: /src/usr/local/emhttp/plugins/open.files3/locales/%locale_with_underscore%.json

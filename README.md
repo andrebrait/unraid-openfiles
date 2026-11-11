@@ -1,5 +1,5 @@
-Open Files for Unraid Server
-============================
+Open Files v3 for Unraid Server
+===============================
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![GitHub Releases](https://img.shields.io/github/v/release/andrebrait/unraid-openfiles)](https://github.com/andrebrait/unraid-openfiles/releases)
@@ -17,10 +17,10 @@ This is a maintained fork of [dkaser/unraid-openfiles](https://github.com/dkaser
 In the Unraid web UI, go to **Plugins → Install Plugin** and enter:
 
 ```
-https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files.plg
+https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files3.plg
 ```
 
-Installing over the original Open Files plugin keeps your settings.
+Installing replaces the previous Open Files plugin (the original `open.files`, or an earlier release of this fork) and keeps your settings. The plugin was renamed to `open.files3` ("Open Files v3") so Community Applications can tell it apart from the original.
 
 ### Requirements
 

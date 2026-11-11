@@ -1,9 +1,10 @@
 {
-    "name": "open.files",
+    "name": "open.files3",
+    "replaces": "open.files",
     "package_name": "unraid-openfiles",
-    "author": "Derek Kaser",
+    "author": "andrebrait",
     "min": "7.0.0",
     "icon": "folder-open",
-    "support": "https://forums.unraid.net/topic/191179-plugin-open-files-see-whats-preventing-unraid-from-shutting-down/",
+    "support": "https://github.com/andrebrait/unraid-openfiles/issues",
     "launch": "Tools/OpenFiles"
 }
