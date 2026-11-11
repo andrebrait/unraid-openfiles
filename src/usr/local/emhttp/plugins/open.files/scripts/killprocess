@@ -22,7 +22,8 @@ function flush_all() {
 	usleep(500);  //* 5 hundreths of a second
 }
 
-//* Returns [state, ppid] from /proc/PID/stat, or null if the process is gone
+//* Returns [state, ppid, starttime] from /proc/PID/stat, or null if the process is gone.
+//* The start time tells apart two processes that got the same PID at different times.
 function proc_stat($pid) {
 	$stat = @file_get_contents("/proc/$pid/stat");
 	if ($stat === false) {
@@ -30,7 +31,7 @@ function proc_stat($pid) {
 	}
 	// comm may contain spaces and parentheses, so split after the last ")"
 	$fields = explode(" ", substr($stat, strrpos($stat, ")") + 2));
-	return [$fields[0], (int)$fields[1]];
+	return [$fields[0], (int)$fields[1], $fields[19]];
 }
 
 function proc_comm($pid) {
@@ -38,10 +39,10 @@ function proc_comm($pid) {
 	return $comm === false ? null : rtrim($comm, "\n");
 }
 
-//* A zombie is already dead, it only waits to be reaped
-function is_alive($pid) {
+//* True while the very process started at $start is running (a zombie is already dead, it only waits to be reaped)
+function target_alive($pid, $start) {
 	$stat = proc_stat($pid);
-	return $stat !== null && $stat[0] !== "Z";
+	return $stat !== null && $stat[2] === $start && $stat[0] !== "Z";
 }
 
 function refuse($message) {
@@ -57,6 +58,9 @@ $pname = $argv[2] ?? "";
 if (!ctype_digit($pnum) || (int)$pnum <= 1) {
 	refuse("Invalid process id.");
 }
+if ($pname === "") {
+	refuse("Missing process name.");
+}
 $pid = (int)$pnum;
 
 //* Never kill ourselves, our ancestors (PHP/nginx/emhttpd serving this request) or the web server itself
@@ -68,24 +72,26 @@ for ($p = getmypid(); $p > 1 && !in_array($p, $protected, true); $p = $stat[1] ?
 		break;
 	}
 }
-$comm = proc_comm($pid);
+$target = proc_stat($pid);
+$comm   = proc_comm($pid);
 if (in_array($pid, $protected, true) || ($comm !== null && preg_match('/^(nginx|emhttpd|php-fpm.*)$/', $comm))) {
 	refuse("Process $pid is part of the web interface and will not be killed.");
 }
 
 echo "Ending process $pid...\n";
 
-if (!is_alive($pid)) {
+if ($target === null || $target[0] === "Z" || $comm === null) {
 	echo "Process $pid has ended...\n";
 	echo "Success...\n";
 	flush_all();
 	exit(0);
 }
+$start = $target[2];
 
 //* The UI may be stale: make sure the PID still belongs to the process the user saw.
-//* lsof truncates names, so accept a prefix match in either direction.
-if ($pname !== "" && ($comm === null || !(str_starts_with($comm, $pname) || str_starts_with($pname, $comm)))) {
-	refuse("Process $pid is now '" . ($comm ?? "?") . "', not '$pname'. Refusing to kill it.");
+//* open.files runs lsof without +c, so it shows COMMAND cut to 9 characters; /proc/PID/comm has up to 15.
+if ($pname !== $comm && $pname !== substr($comm, 0, 9)) {
+	refuse("Process $pid is now '$comm', not '$pname'. Refusing to kill it.");
 }
 
 flush_all();
@@ -93,8 +99,11 @@ flush_all();
 //***************************************
 //* Kill softly (SIGTERM, up to 10 seconds)
 //***************************************
+if (!target_alive($pid, $start)) {
+	refuse("Process $pid changed while it was being checked. Refusing to kill it.");
+}
 posix_kill($pid, KILL_TERM);
-for ($i = 0; $i < 20 && is_alive($pid); $i++) {
+for ($i = 0; $i < 20 && target_alive($pid, $start); $i++) {
 	if ($i === 0) {
 		echo "Checking...\n";
 		flush_all();
@@ -102,11 +111,8 @@ for ($i = 0; $i < 20 && is_alive($pid); $i++) {
 	usleep(500000);
 }
 
-if (!is_alive($pid)) {
+if (!target_alive($pid, $start)) {
 	echo "Process $pid killed with SIGTERM...\n";
-} elseif (proc_comm($pid) !== $comm) {
-	// PID was recycled while waiting
-	echo "Process $pid has ended...\n";
 } else {
 	//***************************************
 	//* Kill hard
@@ -116,7 +122,7 @@ if (!is_alive($pid)) {
 	usleep(500000);
 }
 
-if (is_alive($pid) && proc_comm($pid) === $comm) {
+if (target_alive($pid, $start)) {
 	echo "FAILED....\n";
 	flush_all();
 	exit(1);
