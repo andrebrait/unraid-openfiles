@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="t">
+  <title id="t">Open Files v3 logo</title>
+  <path d="M10 34a8 8 0 0 1 8-8h28l10 12h46a8 8 0 0 1 8 8v54a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8z" fill="#c98a1b"/>
+  <rect x="26" y="30" width="62" height="50" rx="3" fill="#ffffff"/>
+  <line x1="36" y1="44" x2="78" y2="44" stroke="#9fb3c8" stroke-width="4" stroke-linecap="round"/>
+  <line x1="36" y1="56" x2="78" y2="56" stroke="#9fb3c8" stroke-width="4" stroke-linecap="round"/>
+  <line x1="36" y1="68" x2="64" y2="68" stroke="#9fb3c8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M24 66h98l-12 48H10z" fill="#f5b83d"/>
+</svg>

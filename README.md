@@ -1,12 +1,19 @@
-Open Files v3 for Unraid Server
-===============================
+<div align="center">
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![GitHub Releases](https://img.shields.io/github/v/release/andrebrait/unraid-openfiles)](https://github.com/andrebrait/unraid-openfiles/releases)
-[![Last Commit](https://img.shields.io/github/last-commit/andrebrait/unraid-openfiles)](https://github.com/andrebrait/unraid-openfiles/commits/main/)
-[![Code Style: PHP-CS-Fixer](https://img.shields.io/badge/code%20style-php--cs--fixer-brightgreen.svg)](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/andrebrait/unraid-openfiles/total)
-![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/andrebrait/unraid-openfiles/latest/total)
+<img src="docs/assets/logo.svg" alt="Open Files v3 logo" width="150">
+
+<h1>Open Files v3</h1>
+
+<p><strong>Find and kill processes with open files that keep the array from stopping cleanly on <a href="https://unraid.net/">Unraid</a>.</strong></p>
+
+<p>
+  <a href="https://github.com/andrebrait/unraid-openfiles/releases"><img src="https://img.shields.io/github/v/release/andrebrait/unraid-openfiles?label=release&color=blue" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/Unraid-7.0%2B-e8543f" alt="Supported Unraid versions">
+  <a href="https://github.com/andrebrait/unraid-openfiles/releases"><img src="https://img.shields.io/github/downloads/andrebrait/unraid-openfiles/total?color=blueviolet" alt="Downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/andrebrait/unraid-openfiles?color=green" alt="License: GPL-3.0"></a>
+</p>
+
+</div>
 
 ## Fork notice
 
