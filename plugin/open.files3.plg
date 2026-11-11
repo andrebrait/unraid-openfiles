@@ -1,0 +1,87 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN>
+
+<PLUGIN 
+  name="open.files3"
+  author="andrebrait"
+  version="2026.11.15.0000"
+  launch="Tools/OpenFiles"
+  pluginURL="https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files3.plg"
+  support="https://github.com/andrebrait/unraid-openfiles/issues"
+  min="7.0.0"
+  icon="folder-open"
+>
+
+<CHANGES>
+<![CDATA[
+
+### 2026.11.15.0000
+
+- The plugin is renamed to Open Files v3 so Community Applications can tell it apart from the original. Installing it replaces the old plugin and keeps your settings.
+- The plugin's author is andrebrait, and its support link opens this fork's GitHub issues.
+
+### 2026.11.13.0001
+
+- Build: the plugin file is rendered with the jinja2 image published by andrebrait/jinja2-action. No functional changes.
+
+### 2026.11.13.0000
+
+- Build: releases are now produced with the andrebrait forks of the Unraid plugin release action and release drafter. No functional changes.
+
+
+For older releases, see https://github.com/andrebrait/unraid-openfiles/releases
+]]>
+</CHANGES>
+
+<FILE Name="/boot/config/plugins/open.files3/unraid-openfiles-2026.11.15.0000-noarch-1.txz">
+<URL>https://github.com/andrebrait/unraid-openfiles/releases/download/2026.11.15.0000/unraid-openfiles-2026.11.15.0000-noarch-1.txz</URL>
+<SHA256>5c736d98c2f39af6296cac924c6190c2741d74b6d3feb82b94c47d3f060bd458</SHA256>
+</FILE>
+
+<!--
+The 'install' script.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+<![CDATA[
+# Replace the previous plugin of this name: keep its settings, then remove it.
+OLD=/boot/config/plugins/open.files
+NEW=/boot/config/plugins/open.files3
+if [ -d "$OLD" ] && ! ls -A "$NEW" | grep -qv '\.txz$'; then
+  find "$OLD" -mindepth 1 -maxdepth 1 ! -name '*.txz' -exec cp -a {} "$NEW"/ \;
+fi
+rm -f /boot/config/plugins/open.files.plg /var/log/plugins/open.files.plg
+rm -rf "$OLD" /usr/local/emhttp/plugins/open.files
+
+upgradepkg --install-new /boot/config/plugins/open.files3/unraid-openfiles-2026.11.15.0000-noarch-1.txz
+
+# cleanup old versions
+rm -f $(ls /boot/config/plugins/open.files3/unraid-openfiles-*.txz 2>/dev/null | grep -v '2026.11.15.0000')
+
+echo "VERSION=2026.11.15.0000" > /usr/local/emhttp/plugins/open.files3/version.ini
+
+echo ""
+echo "----------------------------------------------------"
+echo " open.files3 has been installed."
+echo " Version: 2026.11.15.0000"
+echo "----------------------------------------------------"
+echo ""
+]]>
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+<![CDATA[
+removepkg unraid-openfiles
+
+rm -rf /usr/local/emhttp/plugins/open.files3
+rm -rf /boot/config/plugins/open.files3
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>
