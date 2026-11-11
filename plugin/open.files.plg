@@ -4,7 +4,7 @@
 <PLUGIN 
   name="open.files"
   author="Derek Kaser"
-  version="2026.11.11.0000"
+  version="2026.11.12.0000"
   launch="Tools/OpenFiles"
   pluginURL="https://raw.githubusercontent.com/andrebrait/unraid-openfiles/main/plugin/open.files.plg"
   support="https://forums.unraid.net/topic/191179-plugin-open-files-see-whats-preventing-unraid-from-shutting-down/"
@@ -14,16 +14,17 @@
 
 <CHANGES>
 <![CDATA[
-###2026.11.11.0000###
-- Fork: plugin, package and updates now come from https://github.com/andrebrait/unraid-openfiles
+###2026.11.12.0000###
+- Security: process names from lsof are escaped before display.
+- Fix: killing a process now requires the process name shown in the list, verifies the process is still the same one (PID reuse protection), refuses system processes, waits up to 10 seconds after SIGTERM before using SIGKILL, and reports the correct signal.
 
 For older releases, see https://github.com/andrebrait/unraid-openfiles/releases
 ]]>
 </CHANGES>
 
-<FILE Name="/boot/config/plugins/open.files/unraid-openfiles-2026.11.11.0000-noarch-1.txz">
-<URL>https://github.com/andrebrait/unraid-openfiles/releases/download/2026.11.11.0000/unraid-openfiles-2026.11.11.0000-noarch-1.txz</URL>
-<SHA256>5b611959ccf65a5a6aa6c89ab06583f5cefdb84b69d1d97496b06c087780fca8</SHA256>
+<FILE Name="/boot/config/plugins/open.files/unraid-openfiles-2026.11.12.0000-noarch-1.txz">
+<URL>https://github.com/andrebrait/unraid-openfiles/releases/download/2026.11.12.0000/unraid-openfiles-2026.11.12.0000-noarch-1.txz</URL>
+<SHA256>ddae05c7e8ce8235521a197e97c01f273751dc51089a1f02c407f44569632e0f</SHA256>
 </FILE>
 
 <!--
@@ -32,17 +33,17 @@ The 'install' script.
 <FILE Run="/bin/bash">
 <INLINE>
 <![CDATA[
-upgradepkg --install-new /boot/config/plugins/open.files/unraid-openfiles-2026.11.11.0000-noarch-1.txz
+upgradepkg --install-new /boot/config/plugins/open.files/unraid-openfiles-2026.11.12.0000-noarch-1.txz
 
 # cleanup old versions
-rm -f $(ls /boot/config/plugins/open.files/unraid-openfiles-*.txz 2>/dev/null | grep -v '2026.11.11.0000')
+rm -f $(ls /boot/config/plugins/open.files/unraid-openfiles-*.txz 2>/dev/null | grep -v '2026.11.12.0000')
 
-echo "VERSION=2026.11.11.0000" > /usr/local/emhttp/plugins/open.files/version.ini
+echo "VERSION=2026.11.12.0000" > /usr/local/emhttp/plugins/open.files/version.ini
 
 echo ""
 echo "----------------------------------------------------"
 echo " open.files has been installed."
-echo " Version: 2026.11.11.0000"
+echo " Version: 2026.11.12.0000"
 echo "----------------------------------------------------"
 echo ""
 ]]>
