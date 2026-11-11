@@ -2,7 +2,7 @@
     "name": "open.files3",
     "replaces": "open.files",
     "package_name": "unraid-openfiles",
-    "author": "Derek Kaser",
+    "author": "andrebrait",
     "min": "7.0.0",
     "icon": "folder-open",
     "support": "https://github.com/andrebrait/unraid-openfiles/issues",
